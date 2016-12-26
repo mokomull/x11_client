@@ -73,4 +73,19 @@ fn main() {
             }
         }
     }
+
+    socket.set_nonblocking(true).unwrap();
+    let mut buf = [0 as u8; 1];
+    let result = socket.read(&mut buf);
+    match result {
+        Ok(_) => { panic!("Did not retrieve all data from server"); }
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::WouldBlock => {
+                println!("Would block!  Ok!");
+            }
+            _ => {
+                panic!("Some other kind of error: {:?}", e);
+            }
+        }
+    }
 }
