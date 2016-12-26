@@ -36,6 +36,8 @@ impl<'a> Into<Vec<u8>> for ClientInit<'a> {
         assert!(self.authorization_protocol_data.is_none());
         ret.write_u16::<BigEndian>(0);
         ret.write_u16::<BigEndian>(0);
+        // the unused data needs to be sent, too.
+        ret.write_u16::<BigEndian>(0);
         ret
     }
 }
