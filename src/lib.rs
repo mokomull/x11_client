@@ -272,3 +272,80 @@ impl Visual {
         })
     }
 }
+
+pub struct CreateWindow {
+    wid: u32,
+    parent: u32,
+    x: u16,
+    y: u16,
+    width: u16,
+    height: u16,
+    border_width: u16,
+    class: u16,
+    visual: u32,
+    depth: u8,
+    // TODO: Option soup for values
+}
+
+impl CreateWindow {
+    pub fn new(
+            depth: u8, wid: u32, parent: u32, x: u16, y: u16,
+            width: u16, height: u16, border_width: u16, class: u16,
+            visual: u32) -> Self {
+        CreateWindow {
+            depth: depth,
+            wid: wid,
+            parent: parent,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            border_width: border_width,
+            class: class,
+            visual: visual,
+        }
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        use byteorder::{BigEndian, WriteBytesExt};
+        let mut ret = Vec::new();
+
+        ret.write_u8(1);
+        ret.write_u8(self.depth);
+        ret.write_u16::<BigEndian>(8); // TODO: length
+        ret.write_u32::<BigEndian>(self.wid);
+        ret.write_u32::<BigEndian>(self.parent);
+        ret.write_u16::<BigEndian>(self.x);
+        ret.write_u16::<BigEndian>(self.y);
+        ret.write_u16::<BigEndian>(self.width);
+        ret.write_u16::<BigEndian>(self.height);
+        ret.write_u16::<BigEndian>(self.border_width);
+        ret.write_u16::<BigEndian>(self.class);
+        ret.write_u32::<BigEndian>(self.visual);
+        ret.write_u32::<BigEndian>(0); // TODO: value-mask and value-list
+
+        ret
+    }
+}
+
+pub struct MapWindow {
+    window: u32,
+}
+
+impl MapWindow {
+    pub fn new(window: u32) -> Self {
+        MapWindow { window: window }
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        use byteorder::{BigEndian, WriteBytesExt};
+        let mut ret = Vec::new();
+
+        ret.write_u8(8);
+        ret.write_u8(0);
+        ret.write_u16::<BigEndian>(2);
+        ret.write_u32::<BigEndian>(self.window);
+
+        ret
+    }
+}
