@@ -312,7 +312,7 @@ impl CreateWindow {
 
         ret.write_u8(1);
         ret.write_u8(self.depth);
-        ret.write_u16::<BigEndian>(9); // TODO: length
+        ret.write_u16::<BigEndian>(10); // TODO: length
         ret.write_u32::<BigEndian>(self.wid);
         ret.write_u32::<BigEndian>(self.parent);
         ret.write_u16::<BigEndian>(self.x);
@@ -323,7 +323,10 @@ impl CreateWindow {
         ret.write_u16::<BigEndian>(self.class);
         ret.write_u32::<BigEndian>(self.visual);
         // TODO: actually create value-mask and value-list
-        ret.write_u32::<BigEndian>(0x800 /* event-mask */); 
+        ret.write_u32::<BigEndian>(
+            0x2 /* background-pixel */ | 0x800 /* event-mask */
+        ); 
+        ret.write_u32::<BigEndian>(0xccffcc);
         ret.write_u32::<BigEndian>(0x8000 /* Exposure */);
 
         ret
