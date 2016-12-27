@@ -467,3 +467,34 @@ impl Event {
         }
     }
 }
+
+pub struct ChangeWmName {
+    window: u32,
+    name: String,
+}
+
+impl ChangeWmName {
+    pub fn new(window: u32, name: String) -> Self {
+        ChangeWmName { window: window, name: name }
+    }
+    pub fn as_bytes(&self) -> Vec<u8> {
+        use byteorder::{BigEndian, WriteBytesExt};
+        let mut ret = Vec::new();
+        let name = self.name.as_bytes();
+        let padding = (4 - (name.len() % 4)) % 4;
+
+        ret.write_u8(18); // ChangeProperty
+        ret.write_u8(0); // Replace
+        ret.write_u16::<BigEndian>(6 + (name.len() + padding) as u16/4);
+        ret.write_u32::<BigEndian>(self.window);
+        ret.write_u32::<BigEndian>(39); // predefined WM_NAME
+        ret.write_u32::<BigEndian>(31); // predefined STRING
+        ret.write_u8(8);
+        for _ in 0..3 { ret.write_u8(0); }
+        ret.write_u32::<BigEndian>(name.len() as u32);
+        ret.write(name);
+        for _ in 0..padding { ret.write_u8(0); }
+
+        ret
+    }
+}

@@ -36,6 +36,11 @@ fn main() {
         0x0000FF,
     ).as_bytes());
 
+    socket.write(&ChangeWmName::new(
+        server_init.resource_id_base + 1,
+        "holy crap that worked".into()
+    ).as_bytes());
+
     loop {
         let mut buf = [0 as u8; 32];
         socket.read_exact(&mut buf).unwrap();
