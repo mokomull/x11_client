@@ -327,7 +327,7 @@ impl CreateWindow {
             0x2 /* background-pixel */ | 0x800 /* event-mask */
         ); 
         ret.write_u32::<BigEndian>(0xccffcc);
-        ret.write_u32::<BigEndian>(0x8000 /* Exposure */);
+        ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */);
 
         ret
     }
@@ -434,6 +434,18 @@ pub enum Event {
         width: u16, height: u16,
         count: u16
     },
+    KeyPress {
+        detail: u8,
+        sequence: u16,
+        time: u32,
+        root: u32,
+        event: u32,
+        child: u32,
+        root_x: i16, root_y: i16,
+        event_x: i16, event_y: i16,
+        state: u16,
+        same_screen: bool,
+    },
     Unknown(u8, [u8; 31]),
 }
 
@@ -457,6 +469,27 @@ impl Event {
                     sequence: sequence, window: window,
                     x: x, y: y, width: width, height: height,
                     count: count
+                }
+            }
+            2 => {
+                let detail = buf.read_u8().unwrap();
+                let sequence = buf.read_u16::<BigEndian>().unwrap();
+                let time = buf.read_u32::<BigEndian>().unwrap();
+                let root = buf.read_u32::<BigEndian>().unwrap();
+                let event = buf.read_u32::<BigEndian>().unwrap();
+                let child = buf.read_u32::<BigEndian>().unwrap();
+                let root_x = buf.read_i16::<BigEndian>().unwrap();
+                let root_y = buf.read_i16::<BigEndian>().unwrap();
+                let event_x = buf.read_i16::<BigEndian>().unwrap();
+                let event_y = buf.read_i16::<BigEndian>().unwrap();
+                let state = buf.read_u16::<BigEndian>().unwrap();
+                let same_screen = buf.read_u8().unwrap() != 0;
+                Event::KeyPress {
+                    detail: detail, sequence: sequence,
+                    time: time, root: root, event: event, child:child,
+                    root_x: root_x, root_y: root_y,
+                    event_x: event_x, event_y: event_y,
+                    state: state, same_screen: same_screen,
                 }
             }
             _ => {
