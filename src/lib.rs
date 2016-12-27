@@ -312,7 +312,7 @@ impl CreateWindow {
 
         ret.write_u8(1);
         ret.write_u8(self.depth);
-        ret.write_u16::<BigEndian>(8); // TODO: length
+        ret.write_u16::<BigEndian>(9); // TODO: length
         ret.write_u32::<BigEndian>(self.wid);
         ret.write_u32::<BigEndian>(self.parent);
         ret.write_u16::<BigEndian>(self.x);
@@ -322,7 +322,9 @@ impl CreateWindow {
         ret.write_u16::<BigEndian>(self.border_width);
         ret.write_u16::<BigEndian>(self.class);
         ret.write_u32::<BigEndian>(self.visual);
-        ret.write_u32::<BigEndian>(0); // TODO: value-mask and value-list
+        // TODO: actually create value-mask and value-list
+        ret.write_u32::<BigEndian>(0x800 /* event-mask */); 
+        ret.write_u32::<BigEndian>(0x8000 /* Exposure */);
 
         ret
     }
@@ -418,5 +420,47 @@ impl PolyFillRectangle {
         ret.write_u16::<BigEndian>(self.height);
 
         ret
+    }
+}
+
+#[derive(Debug)]
+pub enum Event {
+    Expose {
+        sequence: u16, window: u32,
+        x: u16, y: u16,
+        width: u16, height: u16,
+        count: u16
+    },
+    Unknown(u8, [u8; 31]),
+}
+
+impl Event {
+    pub fn from_bytes(data: &[u8; 32]) -> Self {
+        use byteorder::{BigEndian, ReadBytesExt};
+        let mut buf = std::io::Cursor::new(data);
+
+        let t = buf.read_u8().unwrap();
+        match t {
+            12 => {
+                buf.read_u8().unwrap();
+                let sequence = buf.read_u16::<BigEndian>().unwrap();
+                let window = buf.read_u32::<BigEndian>().unwrap();
+                let x = buf.read_u16::<BigEndian>().unwrap();
+                let y = buf.read_u16::<BigEndian>().unwrap();
+                let width = buf.read_u16::<BigEndian>().unwrap();
+                let height = buf.read_u16::<BigEndian>().unwrap();
+                let count = buf.read_u16::<BigEndian>().unwrap();
+                Event::Expose {
+                    sequence: sequence, window: window,
+                    x: x, y: y, width: width, height: height,
+                    count: count
+                }
+            }
+            _ => {
+                let mut rest = [0 as u8; 31];
+                rest.clone_from_slice(&data[1..32]);
+                Event::Unknown(t, rest)
+            }
+        }
     }
 }

@@ -36,33 +36,25 @@ fn main() {
         0x0000FF,
     ).as_bytes());
 
-    std::thread::sleep(std::time::Duration::from_millis(100));
+    loop {
+        let mut buf = [0 as u8; 32];
+        socket.read_exact(&mut buf).unwrap();
 
-    socket.write(&PolyFillRectangle::new(
-        server_init.resource_id_base + 1,
-        server_init.resource_id_base + 2,
-        256,
-        256,
-        512,
-        512,
-    ).as_bytes());
+        let event = Event::from_bytes(&buf);
+        println!("event: {:?}", event);
 
-    std::thread::sleep(std::time::Duration::from_millis(100));
-
-    socket.set_nonblocking(true);
-    let mut buf = [0 as u8; 128];
-    match socket.read(&mut buf) {
-        Ok(count) => {
-            println!("received: {:?}", &buf[..count]);
-        }
-        Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-            println!("Ok! No data yet");
-        }
-        Err(e) => {
-            println!("error: {:?}", e);
+        match event {
+            Event::Expose {..} => {
+                socket.write(&PolyFillRectangle::new(
+                    server_init.resource_id_base + 1,
+                    server_init.resource_id_base + 2,
+                    256,
+                    256,
+                    512,
+                    512,
+                ).as_bytes());
+            }
+            _ => { }
         }
     }
-
-    let mut x = String::new();
-    std::io::stdin().read_line(&mut x);
 }
