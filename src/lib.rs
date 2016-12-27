@@ -349,3 +349,74 @@ impl MapWindow {
         ret
     }
 }
+
+pub struct CreateGc {
+    cid: u32,
+    drawable: u32,
+    foreground: u32,
+}
+
+impl CreateGc {
+    pub fn new(cid: u32, drawable: u32, foreground: u32) -> Self {
+        CreateGc {
+            cid: cid,
+            drawable: drawable,
+            foreground: foreground,
+        }
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        use byteorder::{BigEndian, WriteBytesExt};
+        let mut ret = Vec::new();
+
+        ret.write_u8(55);
+        ret.write_u8(0);
+        ret.write_u16::<BigEndian>(5);
+        ret.write_u32::<BigEndian>(self.cid);
+        ret.write_u32::<BigEndian>(self.drawable);
+        ret.write_u32::<BigEndian>(0x04);
+        ret.write_u32::<BigEndian>(self.foreground);
+
+        ret
+    }
+}
+
+pub struct PolyFillRectangle {
+    drawable: u32,
+    gc: u32,
+    x: i16,
+    y: i16,
+    width: u16,
+    height: u16,
+}
+
+impl PolyFillRectangle {
+    pub fn new(drawable: u32, gc: u32, x: i16, y: i16,
+            width: u16, height: u16) -> Self {
+        PolyFillRectangle {
+            drawable: drawable,
+            gc: gc,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+        }
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        use byteorder::{BigEndian, WriteBytesExt};
+        let mut ret = Vec::new();
+
+        ret.write_u8(70);
+        ret.write_u8(0);
+        ret.write_u16::<BigEndian>(5);
+        ret.write_u32::<BigEndian>(self.drawable);
+        ret.write_u32::<BigEndian>(self.gc);
+        ret.write_i16::<BigEndian>(self.x);
+        ret.write_i16::<BigEndian>(self.y);
+        ret.write_u16::<BigEndian>(self.width);
+        ret.write_u16::<BigEndian>(self.height);
+
+        ret
+    }
+}

@@ -30,6 +30,23 @@ fn main() {
         server_init.resource_id_base + 1
     ).as_bytes());
 
+    socket.write(&CreateGc::new(
+        server_init.resource_id_base + 2,
+        server_init.resource_id_base + 1,
+        0x0000FF,
+    ).as_bytes());
+
+    std::thread::sleep(std::time::Duration::from_millis(100));
+
+    socket.write(&PolyFillRectangle::new(
+        server_init.resource_id_base + 1,
+        server_init.resource_id_base + 2,
+        256,
+        256,
+        512,
+        512,
+    ).as_bytes());
+
     std::thread::sleep(std::time::Duration::from_millis(100));
 
     socket.set_nonblocking(true);
