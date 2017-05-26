@@ -28,18 +28,17 @@ impl<'a> Into<Vec<u8>> for ClientInit<'a> {
         use std::io::Write;
         use byteorder::{BigEndian, WriteBytesExt};
 
-        let mut bytes = [0 as u8; 2];
         let mut ret = Vec::new();
 
-        ret.write(b"B\x00");
-        ret.write_u16::<BigEndian>(self.major);
-        ret.write_u16::<BigEndian>(self.minor);
+        ret.write_all(b"B\x00").unwrap();
+        ret.write_u16::<BigEndian>(self.major).unwrap();
+        ret.write_u16::<BigEndian>(self.minor).unwrap();
         assert!(self.authorization_protocol_name.is_none());
         assert!(self.authorization_protocol_data.is_none());
-        ret.write_u16::<BigEndian>(0);
-        ret.write_u16::<BigEndian>(0);
+        ret.write_u16::<BigEndian>(0).unwrap();
+        ret.write_u16::<BigEndian>(0).unwrap();
         // the unused data needs to be sent, too.
-        ret.write_u16::<BigEndian>(0);
+        ret.write_u16::<BigEndian>(0).unwrap();
         ret
     }
 }
@@ -68,6 +67,7 @@ impl ServerInit {
         use byteorder::{BigEndian, ReadBytesExt};
 
         let success = stream.read_u8()?;
+        assert_eq!(success, 1);
         stream.read_u8()?;
         let major = stream.read_u16::<BigEndian>()?;
         let minor = stream.read_u16::<BigEndian>()?;
@@ -310,24 +310,24 @@ impl CreateWindow {
         use byteorder::{BigEndian, WriteBytesExt};
         let mut ret = Vec::new();
 
-        ret.write_u8(1);
-        ret.write_u8(self.depth);
-        ret.write_u16::<BigEndian>(10); // TODO: length
-        ret.write_u32::<BigEndian>(self.wid);
-        ret.write_u32::<BigEndian>(self.parent);
-        ret.write_u16::<BigEndian>(self.x);
-        ret.write_u16::<BigEndian>(self.y);
-        ret.write_u16::<BigEndian>(self.width);
-        ret.write_u16::<BigEndian>(self.height);
-        ret.write_u16::<BigEndian>(self.border_width);
-        ret.write_u16::<BigEndian>(self.class);
-        ret.write_u32::<BigEndian>(self.visual);
+        ret.write_u8(1).unwrap();
+        ret.write_u8(self.depth).unwrap();
+        ret.write_u16::<BigEndian>(10).unwrap(); // TODO: length
+        ret.write_u32::<BigEndian>(self.wid).unwrap();
+        ret.write_u32::<BigEndian>(self.parent).unwrap();
+        ret.write_u16::<BigEndian>(self.x).unwrap();
+        ret.write_u16::<BigEndian>(self.y).unwrap();
+        ret.write_u16::<BigEndian>(self.width).unwrap();
+        ret.write_u16::<BigEndian>(self.height).unwrap();
+        ret.write_u16::<BigEndian>(self.border_width).unwrap();
+        ret.write_u16::<BigEndian>(self.class).unwrap();
+        ret.write_u32::<BigEndian>(self.visual).unwrap();
         // TODO: actually create value-mask and value-list
         ret.write_u32::<BigEndian>(
             0x2 /* background-pixel */ | 0x800 /* event-mask */
-        ); 
-        ret.write_u32::<BigEndian>(0xccffcc);
-        ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */);
+        ).unwrap();
+        ret.write_u32::<BigEndian>(0xccffcc).unwrap();
+        ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */).unwrap();
 
         ret
     }
@@ -346,10 +346,10 @@ impl MapWindow {
         use byteorder::{BigEndian, WriteBytesExt};
         let mut ret = Vec::new();
 
-        ret.write_u8(8);
-        ret.write_u8(0);
-        ret.write_u16::<BigEndian>(2);
-        ret.write_u32::<BigEndian>(self.window);
+        ret.write_u8(8).unwrap();
+        ret.write_u8(0).unwrap();
+        ret.write_u16::<BigEndian>(2).unwrap();
+        ret.write_u32::<BigEndian>(self.window).unwrap();
 
         ret
     }
@@ -374,13 +374,13 @@ impl CreateGc {
         use byteorder::{BigEndian, WriteBytesExt};
         let mut ret = Vec::new();
 
-        ret.write_u8(55);
-        ret.write_u8(0);
-        ret.write_u16::<BigEndian>(5);
-        ret.write_u32::<BigEndian>(self.cid);
-        ret.write_u32::<BigEndian>(self.drawable);
-        ret.write_u32::<BigEndian>(0x04);
-        ret.write_u32::<BigEndian>(self.foreground);
+        ret.write_u8(55).unwrap();
+        ret.write_u8(0).unwrap();
+        ret.write_u16::<BigEndian>(5).unwrap();
+        ret.write_u32::<BigEndian>(self.cid).unwrap();
+        ret.write_u32::<BigEndian>(self.drawable).unwrap();
+        ret.write_u32::<BigEndian>(0x04).unwrap();
+        ret.write_u32::<BigEndian>(self.foreground).unwrap();
 
         ret
     }
@@ -412,15 +412,15 @@ impl PolyFillRectangle {
         use byteorder::{BigEndian, WriteBytesExt};
         let mut ret = Vec::new();
 
-        ret.write_u8(70);
-        ret.write_u8(0);
-        ret.write_u16::<BigEndian>(5);
-        ret.write_u32::<BigEndian>(self.drawable);
-        ret.write_u32::<BigEndian>(self.gc);
-        ret.write_i16::<BigEndian>(self.x);
-        ret.write_i16::<BigEndian>(self.y);
-        ret.write_u16::<BigEndian>(self.width);
-        ret.write_u16::<BigEndian>(self.height);
+        ret.write_u8(70).unwrap();
+        ret.write_u8(0).unwrap();
+        ret.write_u16::<BigEndian>(5).unwrap();
+        ret.write_u32::<BigEndian>(self.drawable).unwrap();
+        ret.write_u32::<BigEndian>(self.gc).unwrap();
+        ret.write_i16::<BigEndian>(self.x).unwrap();
+        ret.write_i16::<BigEndian>(self.y).unwrap();
+        ret.write_u16::<BigEndian>(self.width).unwrap();
+        ret.write_u16::<BigEndian>(self.height).unwrap();
 
         ret
     }
@@ -516,17 +516,17 @@ impl ChangeWmName {
         let name = self.name.as_bytes();
         let padding = (4 - (name.len() % 4)) % 4;
 
-        ret.write_u8(18); // ChangeProperty
-        ret.write_u8(0); // Replace
-        ret.write_u16::<BigEndian>(6 + (name.len() + padding) as u16/4);
-        ret.write_u32::<BigEndian>(self.window);
-        ret.write_u32::<BigEndian>(39); // predefined WM_NAME
-        ret.write_u32::<BigEndian>(31); // predefined STRING
-        ret.write_u8(8);
-        for _ in 0..3 { ret.write_u8(0); }
-        ret.write_u32::<BigEndian>(name.len() as u32);
-        ret.write(name);
-        for _ in 0..padding { ret.write_u8(0); }
+        ret.write_u8(18).unwrap(); // ChangeProperty
+        ret.write_u8(0).unwrap(); // Replace
+        ret.write_u16::<BigEndian>(6 + (name.len() + padding) as u16/4).unwrap();
+        ret.write_u32::<BigEndian>(self.window).unwrap();
+        ret.write_u32::<BigEndian>(39).unwrap(); // predefined WM_NAME
+        ret.write_u32::<BigEndian>(31).unwrap(); // predefined STRING
+        ret.write_u8(8).unwrap();
+        for _ in 0..3 { ret.write_u8(0).unwrap(); }
+        ret.write_u32::<BigEndian>(name.len() as u32).unwrap();
+        ret.write(name).unwrap();
+        for _ in 0..padding { ret.write_u8(0).unwrap(); }
 
         ret
     }

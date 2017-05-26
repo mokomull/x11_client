@@ -24,22 +24,22 @@ fn main() {
         1, // InputOutput
         0, // CopyFromParent
     );
-    socket.write(&create_window.as_bytes());
+    socket.write(&create_window.as_bytes()).unwrap();
 
     socket.write(&MapWindow::new(
         server_init.resource_id_base + 1
-    ).as_bytes());
+    ).as_bytes()).unwrap();
 
     socket.write(&CreateGc::new(
         server_init.resource_id_base + 2,
         server_init.resource_id_base + 1,
         0x0000FF,
-    ).as_bytes());
+    ).as_bytes()).unwrap();
 
     socket.write(&ChangeWmName::new(
         server_init.resource_id_base + 1,
         "holy crap that worked".into()
-    ).as_bytes());
+    ).as_bytes()).unwrap();
 
     loop {
         let mut buf = [0 as u8; 32];
@@ -57,7 +57,7 @@ fn main() {
                     256,
                     512,
                     512,
-                ).as_bytes());
+                ).as_bytes()).unwrap();
             }
             _ => { }
         }
