@@ -25,7 +25,6 @@ impl<'a> ClientInit<'a> {
 
 impl<'a> Into<Vec<u8>> for ClientInit<'a> {
     fn into(self: Self) -> Vec<u8> {
-        use std::io::Write;
         use byteorder::{BigEndian, WriteBytesExt};
 
         let mut ret = Vec::new();
@@ -106,22 +105,22 @@ impl ServerInit {
         }
 
         Ok(ServerInit {
-            major: major,
-            minor: minor,
-            release_number: release_number,
-            resource_id_base: resource_id_base,
-            resource_id_mask: resource_id_mask,
-            motion_buffer_size: motion_buffer_size,
-            maximum_request_length: maximum_request_length,
-            image_byte_order: image_byte_order,
-            bitmap_format_bit_order: bitmap_format_bit_order,
-            bitmap_format_scanline_unit: bitmap_format_scanline_unit,
-            bitmap_format_scanline_pad: bitmap_format_scanline_pad,
-            min_keycode: min_keycode,
-            max_keycode: max_keycode,
+            major,
+            minor,
+            release_number,
+            resource_id_base,
+            resource_id_mask,
+            motion_buffer_size,
+            maximum_request_length,
+            image_byte_order,
+            bitmap_format_bit_order,
+            bitmap_format_scanline_unit,
+            bitmap_format_scanline_pad,
+            min_keycode,
+            max_keycode,
 
-            pixmap_formats: pixmap_formats,
-            roots: roots,
+            pixmap_formats,
+            roots,
             vendor: String::from_utf8(vendor_bytes).unwrap(),
         })
     }
@@ -141,10 +140,10 @@ impl PixmapFormat {
         let scanline_pad = stream.read_u8()?;
         stream.read_exact(&mut [0; 5])?;
 
-        Ok(PixmapFormat{
-            depth: depth,
-            bits_per_pixel: bits_per_pixel,
-            scanline_pad: scanline_pad,
+        Ok(PixmapFormat {
+            depth,
+            bits_per_pixel,
+            scanline_pad,
         })
     }
 }
@@ -194,22 +193,22 @@ impl Screen {
         }
 
         Ok(Screen {
-            root: root,
-            default_colormap: default_colormap,
-            white_pixel: white_pixel,
-            black_pixel: black_pixel,
-            current_input_masks: current_input_masks,
-            width_pixels: width_pixels,
-            height_pixels: height_pixels,
-            width_millimeters: width_millimeters,
-            height_millimeters: height_millimeters,
-            min_installed_maps: min_installed_maps,
-            max_installed_maps: max_installed_maps,
-            root_visual: root_visual,
-            backing_stores: backing_stores,
-            save_unders: save_unders,
-            root_depth: root_depth,
-            allowed_depths: allowed_depths,
+            root,
+            default_colormap,
+            white_pixel,
+            black_pixel,
+            current_input_masks,
+            width_pixels,
+            height_pixels,
+            width_millimeters,
+            height_millimeters,
+            min_installed_maps,
+            max_installed_maps,
+            root_visual,
+            backing_stores,
+            save_unders,
+            root_depth,
+            allowed_depths,
         })
     }
 }
@@ -232,10 +231,7 @@ impl Depth {
             visuals.push(Visual::from_stream(stream)?);
         }
 
-        Ok(Depth {
-            depth: depth,
-            visuals: visuals,
-        })
+        Ok(Depth { depth, visuals })
     }
 }
 
@@ -262,13 +258,13 @@ impl Visual {
         stream.read_u32::<BigEndian>()?;
 
         Ok(Visual {
-            id: id,
-            class: class,
-            bits_per_rgb_value: bits_per_rgb_value,
-            colormap_entries: colormap_entries,
-            red_mask: red_mask,
-            green_mask: green_mask,
-            blue_mask: blue_mask,
+            id,
+            class,
+            bits_per_rgb_value,
+            colormap_entries,
+            red_mask,
+            green_mask,
+            blue_mask,
         })
     }
 }
@@ -293,16 +289,16 @@ impl CreateWindow {
             width: u16, height: u16, border_width: u16, class: u16,
             visual: u32) -> Self {
         CreateWindow {
-            depth: depth,
-            wid: wid,
-            parent: parent,
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            border_width: border_width,
-            class: class,
-            visual: visual,
+            depth,
+            wid,
+            parent,
+            x,
+            y,
+            width,
+            height,
+            border_width,
+            class,
+            visual,
         }
     }
 
@@ -326,7 +322,7 @@ impl CreateWindow {
         ret.write_u32::<BigEndian>(
             0x2 /* background-pixel */ | 0x800 /* event-mask */
         ).unwrap();
-        ret.write_u32::<BigEndian>(0xccffcc).unwrap();
+        ret.write_u32::<BigEndian>(0xcc_ff_cc).unwrap();
         ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */).unwrap();
 
         ret
@@ -339,7 +335,7 @@ pub struct MapWindow {
 
 impl MapWindow {
     pub fn new(window: u32) -> Self {
-        MapWindow { window: window }
+        MapWindow { window }
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
@@ -364,9 +360,9 @@ pub struct CreateGc {
 impl CreateGc {
     pub fn new(cid: u32, drawable: u32, foreground: u32) -> Self {
         CreateGc {
-            cid: cid,
-            drawable: drawable,
-            foreground: foreground,
+            cid,
+            drawable,
+            foreground,
         }
     }
 
@@ -399,12 +395,12 @@ impl PolyFillRectangle {
     pub fn new(drawable: u32, gc: u32, x: i16, y: i16,
             width: u16, height: u16) -> Self {
         PolyFillRectangle {
-            drawable: drawable,
-            gc: gc,
-            x: x,
-            y: y,
-            width: width,
-            height: height,
+            drawable,
+            gc,
+            x,
+            y,
+            width,
+            height,
         }
     }
 
@@ -466,9 +462,13 @@ impl Event {
                 let height = buf.read_u16::<BigEndian>().unwrap();
                 let count = buf.read_u16::<BigEndian>().unwrap();
                 Event::Expose {
-                    sequence: sequence, window: window,
-                    x: x, y: y, width: width, height: height,
-                    count: count
+                    sequence,
+                    window,
+                    x,
+                    y,
+                    width,
+                    height,
+                    count,
                 }
             }
             2 => {
@@ -485,11 +485,18 @@ impl Event {
                 let state = buf.read_u16::<BigEndian>().unwrap();
                 let same_screen = buf.read_u8().unwrap() != 0;
                 Event::KeyPress {
-                    detail: detail, sequence: sequence,
-                    time: time, root: root, event: event, child:child,
-                    root_x: root_x, root_y: root_y,
-                    event_x: event_x, event_y: event_y,
-                    state: state, same_screen: same_screen,
+                    detail,
+                    sequence,
+                    time,
+                    root,
+                    event,
+                    child,
+                    root_x,
+                    root_y,
+                    event_x,
+                    event_y,
+                    state,
+                    same_screen,
                 }
             }
             _ => {
@@ -508,7 +515,7 @@ pub struct ChangeWmName {
 
 impl ChangeWmName {
     pub fn new(window: u32, name: String) -> Self {
-        ChangeWmName { window: window, name: name }
+        ChangeWmName { window, name }
     }
     pub fn as_bytes(&self) -> Vec<u8> {
         use byteorder::{BigEndian, WriteBytesExt};
@@ -525,7 +532,7 @@ impl ChangeWmName {
         ret.write_u8(8).unwrap();
         for _ in 0..3 { ret.write_u8(0).unwrap(); }
         ret.write_u32::<BigEndian>(name.len() as u32).unwrap();
-        ret.write(name).unwrap();
+        ret.write_all(name).unwrap();
         for _ in 0..padding { ret.write_u8(0).unwrap(); }
 
         ret

@@ -8,7 +8,7 @@ fn main() {
     let mut socket = UnixStream::connect("/tmp/.X11-unix/X0").unwrap();
 
     let client_init: Vec<_> = ClientInit::new().into();
-    socket.write(&client_init).unwrap();
+    socket.write_all(&client_init).unwrap();
 
     let server_init = ServerInit::from_stream(&mut socket).unwrap();
 
@@ -24,19 +24,19 @@ fn main() {
         1, // InputOutput
         0, // CopyFromParent
     );
-    socket.write(&create_window.as_bytes()).unwrap();
+    socket.write_all(&create_window.as_bytes()).unwrap();
 
-    socket.write(&MapWindow::new(
+    socket.write_all(&MapWindow::new(
         server_init.resource_id_base + 1
     ).as_bytes()).unwrap();
 
-    socket.write(&CreateGc::new(
+    socket.write_all(&CreateGc::new(
         server_init.resource_id_base + 2,
         server_init.resource_id_base + 1,
-        0x0000FF,
+        0x00_00_FF,
     ).as_bytes()).unwrap();
 
-    socket.write(&ChangeWmName::new(
+    socket.write_all(&ChangeWmName::new(
         server_init.resource_id_base + 1,
         "holy crap that worked".into()
     ).as_bytes()).unwrap();
@@ -48,18 +48,15 @@ fn main() {
         let event = Event::from_bytes(&buf);
         println!("event: {:?}", event);
 
-        match event {
-            Event::Expose {..} => {
-                socket.write(&PolyFillRectangle::new(
-                    server_init.resource_id_base + 1,
-                    server_init.resource_id_base + 2,
-                    256,
-                    256,
-                    512,
-                    512,
-                ).as_bytes()).unwrap();
-            }
-            _ => { }
+        if let Event::Expose {..} = event {
+            socket.write_all(&PolyFillRectangle::new(
+                server_init.resource_id_base + 1,
+                server_init.resource_id_base + 2,
+                256,
+                256,
+                512,
+                512,
+            ).as_bytes()).unwrap();
         }
     }
 }

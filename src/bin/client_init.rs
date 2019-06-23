@@ -8,7 +8,7 @@ fn main() {
     let mut socket = UnixStream::connect("/tmp/.X11-unix/X0").unwrap();
 
     let client_init: Vec<_> = ClientInit::new().into();
-    socket.write(&client_init).unwrap();
+    socket.write_all(&client_init).unwrap();
 
     let server_response = ServerInit::from_stream(&mut socket).unwrap();
 
@@ -69,7 +69,7 @@ fn main() {
                 println!("\t\t\tred_mask: {}", visual.red_mask);
                 println!("\t\t\tgreen_mask: {}", visual.green_mask);
                 println!("\t\t\tblue_mask: {}", visual.blue_mask);
-                println!("");
+                println!();
             }
         }
     }
