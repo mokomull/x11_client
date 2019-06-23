@@ -2,6 +2,7 @@
 name = "x11_client"
 version = "0.1.0"
 authors = ["Matt Mullins <mmullins@mmlx.us>"]
+edition = "2018"
 
 [dependencies]
 byteorder = "^1.3"

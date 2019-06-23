@@ -1,8 +1,6 @@
 #[cfg(test)]
 mod tests;
 
-extern crate byteorder;
-
 use std::io::{Read, Result, Write};
 
 pub struct ClientInit<'a> {

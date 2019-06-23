@@ -1,4 +1,3 @@
-extern crate x11_client;
 use x11_client::*;
 
 use std::io::prelude::*;
