@@ -1,8 +1,8 @@
 extern crate x11_client;
 use x11_client::*;
 
-use std::os::unix::net::UnixStream;
 use std::io::prelude::*;
+use std::os::unix::net::UnixStream;
 
 fn main() {
     let mut socket = UnixStream::connect("/tmp/.X11-unix/X0").unwrap();
@@ -18,15 +18,23 @@ fn main() {
     println!("resource_id_base: {}", server_response.resource_id_base);
     println!("resource_id_mask: {}", server_response.resource_id_mask);
     println!("motion_buffer_size: {}", server_response.motion_buffer_size);
-    println!("maximum_request_length: {}",
-        server_response.maximum_request_length);
+    println!(
+        "maximum_request_length: {}",
+        server_response.maximum_request_length
+    );
     println!("image_byte_order: {}", server_response.image_byte_order);
-    println!("bitmap_format_bit_order: {}",
-        server_response.bitmap_format_bit_order);
-    println!("bitmap_format_scanline_unit: {}",
-        server_response.bitmap_format_scanline_unit);
-    println!("bitmap_format_scanline_pad: {}",
-        server_response.bitmap_format_scanline_pad);
+    println!(
+        "bitmap_format_bit_order: {}",
+        server_response.bitmap_format_bit_order
+    );
+    println!(
+        "bitmap_format_scanline_unit: {}",
+        server_response.bitmap_format_scanline_unit
+    );
+    println!(
+        "bitmap_format_scanline_pad: {}",
+        server_response.bitmap_format_scanline_pad
+    );
     println!("min_keycode: {}", server_response.min_keycode);
     println!("max_keycode: {}", server_response.max_keycode);
     println!("vendor: {}", server_response.vendor);
@@ -78,7 +86,9 @@ fn main() {
     let mut buf = [0 as u8; 1];
     let result = socket.read(&mut buf);
     match result {
-        Ok(_) => { panic!("Did not retrieve all data from server"); }
+        Ok(_) => {
+            panic!("Did not retrieve all data from server");
+        }
         Err(e) => match e.kind() {
             std::io::ErrorKind::WouldBlock => {
                 println!("Would block!  Ok!");
@@ -86,6 +96,6 @@ fn main() {
             _ => {
                 panic!("Some other kind of error: {:?}", e);
             }
-        }
+        },
     }
 }

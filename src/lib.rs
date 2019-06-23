@@ -3,7 +3,7 @@ mod tests;
 
 extern crate byteorder;
 
-use std::io::{Read, Write, Result};
+use std::io::{Read, Result, Write};
 
 pub struct ClientInit<'a> {
     major: u16,
@@ -285,9 +285,17 @@ pub struct CreateWindow {
 
 impl CreateWindow {
     pub fn new(
-            depth: u8, wid: u32, parent: u32, x: u16, y: u16,
-            width: u16, height: u16, border_width: u16, class: u16,
-            visual: u32) -> Self {
+        depth: u8,
+        wid: u32,
+        parent: u32,
+        x: u16,
+        y: u16,
+        width: u16,
+        height: u16,
+        border_width: u16,
+        class: u16,
+        visual: u32,
+    ) -> Self {
         CreateWindow {
             depth,
             wid,
@@ -319,11 +327,11 @@ impl CreateWindow {
         ret.write_u16::<BigEndian>(self.class).unwrap();
         ret.write_u32::<BigEndian>(self.visual).unwrap();
         // TODO: actually create value-mask and value-list
-        ret.write_u32::<BigEndian>(
-            0x2 /* background-pixel */ | 0x800 /* event-mask */
-        ).unwrap();
+        ret.write_u32::<BigEndian>(0x2 /* background-pixel */ | 0x800 /* event-mask */)
+            .unwrap();
         ret.write_u32::<BigEndian>(0xcc_ff_cc).unwrap();
-        ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */).unwrap();
+        ret.write_u32::<BigEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */)
+            .unwrap();
 
         ret
     }
@@ -392,8 +400,7 @@ pub struct PolyFillRectangle {
 }
 
 impl PolyFillRectangle {
-    pub fn new(drawable: u32, gc: u32, x: i16, y: i16,
-            width: u16, height: u16) -> Self {
+    pub fn new(drawable: u32, gc: u32, x: i16, y: i16, width: u16, height: u16) -> Self {
         PolyFillRectangle {
             drawable,
             gc,
@@ -425,10 +432,13 @@ impl PolyFillRectangle {
 #[derive(Debug)]
 pub enum Event {
     Expose {
-        sequence: u16, window: u32,
-        x: u16, y: u16,
-        width: u16, height: u16,
-        count: u16
+        sequence: u16,
+        window: u32,
+        x: u16,
+        y: u16,
+        width: u16,
+        height: u16,
+        count: u16,
     },
     KeyPress {
         detail: u8,
@@ -437,8 +447,10 @@ pub enum Event {
         root: u32,
         event: u32,
         child: u32,
-        root_x: i16, root_y: i16,
-        event_x: i16, event_y: i16,
+        root_x: i16,
+        root_y: i16,
+        event_x: i16,
+        event_y: i16,
         state: u16,
         same_screen: bool,
     },
@@ -525,15 +537,20 @@ impl ChangeWmName {
 
         ret.write_u8(18).unwrap(); // ChangeProperty
         ret.write_u8(0).unwrap(); // Replace
-        ret.write_u16::<BigEndian>(6 + (name.len() + padding) as u16/4).unwrap();
+        ret.write_u16::<BigEndian>(6 + (name.len() + padding) as u16 / 4)
+            .unwrap();
         ret.write_u32::<BigEndian>(self.window).unwrap();
         ret.write_u32::<BigEndian>(39).unwrap(); // predefined WM_NAME
         ret.write_u32::<BigEndian>(31).unwrap(); // predefined STRING
         ret.write_u8(8).unwrap();
-        for _ in 0..3 { ret.write_u8(0).unwrap(); }
+        for _ in 0..3 {
+            ret.write_u8(0).unwrap();
+        }
         ret.write_u32::<BigEndian>(name.len() as u32).unwrap();
         ret.write_all(name).unwrap();
-        for _ in 0..padding { ret.write_u8(0).unwrap(); }
+        for _ in 0..padding {
+            ret.write_u8(0).unwrap();
+        }
 
         ret
     }
